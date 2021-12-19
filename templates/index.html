@@ -1,3 +1,5 @@
+<!--I am going to use front page data in this index.html file-->
+
 {% extends 'base.html' %}
 
 {% block head %}
@@ -8,11 +10,16 @@
 {% block body %}
 
 <div class="content">
+
+    <!--giving heading as DoremonLabs in h1(size is bigger)-->
     <h1>DoremonLabs Projects</h1>
     {% if tasks|length < 1 %}
+
+    <!--Commenting note in h4 (size is smaller than h1)-->
     <h4>No projects are assigned...Assign few projects below!</h4>
     {% else %}
 
+    <!--creation of table by using table row, table heading and table data-->
     <table>
         <tr>
             <th> Projects  </th>
@@ -32,6 +39,8 @@
             {% endfor %}
     </table>
     {% endif %}
+
+    <!--creating a form in which we take input-->
     <form action="/" method="POST">
         <input type="text" name="content" id="content">
         <input type="submit" value="Add Project">
