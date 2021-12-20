@@ -20,13 +20,16 @@ from datetime import datetime
 app = Flask(__name__)
 
 #Lets configure variable's directly into app.config and store the data in sqlite as test.db
-app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
+#old db
+#app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
 
+#new db
+app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://root:rudra@localhost/test'
 #object relational mapper (ORM) that enables Python to communicate with the SQL database(sqlite)
 db = SQLAlchemy(app)
 
 #The baseclass for model is called db.Model
-class Todo(db.Model):
+class DoremonLabs(db.Model):
     #Use Column to define a column and use first argument as types(datatypes)
     #for id it is integer
     id = db.Column(db.Integer,primary_key=True)
@@ -61,7 +64,7 @@ def index():
         project_content = request.form['content']
 
         #pass the new project content to todo
-        project_task=Todo(content=project_content)
+        project_task=DoremonLabs(content=project_content)
 
         try:
             #creates the session at the request start 
@@ -72,7 +75,7 @@ def index():
         except:
             return "There is an issue adding your task"
     else:
-        projects = Todo.query.order_by(Todo.date_created).all()
+        projects = DoremonLabs.query.order_by(DoremonLabs.date_created).all()
         return render_template('index.html',projects=projects)
 
 @app.route('/delete/<int:id>')
@@ -81,7 +84,7 @@ def delete(id):
     '''this function is used for deleting an id from the todo'''
 
     #query.get_or_404 we can call it to class object and return the object
-    project_to_delete = Todo.query.get_or_404(id)
+    project_to_delete = DoremonLabs.query.get_or_404(id)
 
     try:
         #unlink the project using session.delete
@@ -96,7 +99,7 @@ def update(id):
 
     '''this function is for updating any information when we need to change'''
 
-    project = Todo.query.get_or_404(id)
+    project = DoremonLabs.query.get_or_404(id)
     if request.method=='POST':
         project.content = request.form['content']
 
