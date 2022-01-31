@@ -5,6 +5,7 @@
 #To access the incoming data in Flask, you have to use the request object
 #The request object holds all incoming data from the request
 #redirect will returns a response object and redirects the user to another target location with specified status code
+from asyncio import tasks
 from flask import Flask, render_template,url_for,request,redirect
 
 #Flask-SQLAlchemy provides a queryattribute on your Modelclass.
@@ -21,15 +22,15 @@ app = Flask(__name__)
 
 #Lets configure variable's directly into app.config and store the data in sqlite as test.db
 #old db
-#app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
+app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///test.db'
 
 #new db
-app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://root:rudra@localhost/test'
+#app.config['SQLALCHEMY_DATABASE_URI']='mysql+pymysql://root:rudra@localhost/test'
 #object relational mapper (ORM) that enables Python to communicate with the SQL database(sqlite)
 db = SQLAlchemy(app)
 
 #The baseclass for model is called db.Model
-class DoremonLabs(db.Model):
+class Todo(db.Model):
     #Use Column to define a column and use first argument as types(datatypes)
     #for id it is integer
     id = db.Column(db.Integer,primary_key=True)
@@ -61,22 +62,22 @@ def index():
     if request.method == 'POST':
 
         #reading the content or to access form data in our route, we use request.form
-        project_content = request.form['content']
+        task_content = request.form['content']
 
         #pass the new project content to todo
-        project_task=DoremonLabs(content=project_content)
+        new_task=Todo(content=task_content)
 
         try:
             #creates the session at the request start 
             #and it destroys it at the request end
-            db.session.add(project_task)
+            db.session.add(new_task)
             db.session.commit()
             return redirect('/')
         except:
             return "There is an issue adding your task"
     else:
-        projects = DoremonLabs.query.order_by(DoremonLabs.date_created).all()
-        return render_template('index.html',projects=projects)
+        projects = Todo.query.order_by(Todo.date_created).all()
+        return render_template('index.html',tasks=tasks)
 
 @app.route('/delete/<int:id>')
 def delete(id):
@@ -84,11 +85,11 @@ def delete(id):
     '''this function is used for deleting an id from the todo'''
 
     #query.get_or_404 we can call it to class object and return the object
-    project_to_delete = DoremonLabs.query.get_or_404(id)
+    task_to_delete = Todo.query.get_or_404(id)
 
     try:
         #unlink the project using session.delete
-        db.session.delete(project_to_delete)
+        db.session.delete(task_to_delete)
         db.session.commit()
         return redirect('/')
     except:
@@ -99,9 +100,9 @@ def update(id):
 
     '''this function is for updating any information when we need to change'''
 
-    project = DoremonLabs.query.get_or_404(id)
+    task = Todo.query.get_or_404(id)
     if request.method=='POST':
-        project.content = request.form['content']
+        task.content = request.form['content']
 
         try:
             db.session.commit()
@@ -109,7 +110,7 @@ def update(id):
         except:
             return "There was an issue while updating project"
     else:
-        return render_template('update.html',project=project)
+        return render_template('update.html',task=task)
 
 if __name__=="__main__":
 
