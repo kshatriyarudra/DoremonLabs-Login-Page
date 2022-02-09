@@ -1,4 +1,4 @@
-This project is based on Flask activity:
+# This project is based on Flask activity and html:
 
 About Task-
             Output of this project is for making blog post application and front page of my job company.
